@@ -1,19 +1,25 @@
 from TexSoup import TexSoup
+import pandas as pd
 
 a=input("Input the TeX file name:")
 #soup으로 파일 부르기
-with open(a) as f:
-    soup = TexSoup(f)
+with open(a) as f: data = f.read() 
 
-label_list = soup.find_all('label')
-ref_list = soup.find_all('ref')
+reflist = []
 
-for i in label_list:
-    a=i.string
+soup = TexSoup(data) 
+
+for label in soup.find_all('label'):
+    label_str = label.string
     count = 0
-    for j in ref_list:
-        b=j.string
-        if a == b:
-            count = count +1
-    print('label:{}, count:{}'.format(a,count))
+    for ref in soup.find_all('ref'):
+        ref_str = ref.string
+        if label_str == ref_str:
+            count = count + 1
+
+    reflist.append([label_str,count])     
         
+reflist_pd = pd.DataFrame(reflist,columns=['label','count'])
+print("Mission Complete!")
+
+reflist_pd.to_csv('result.csv')
